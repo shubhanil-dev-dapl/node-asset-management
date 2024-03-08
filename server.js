@@ -27,8 +27,8 @@ sequelize.authenticate().then(() => {
 
 // routing path
 // Admin Router 
-const adminRouter = require('./routes/admin');
-app.use('/admin',adminRouter)
+// const adminRouter = require('./routes/admin');
+// app.use('/admin',adminRouter)
 
 // User Router
 const userRouter = require('./routes/userRoute')
