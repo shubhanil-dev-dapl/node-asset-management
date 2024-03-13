@@ -4,13 +4,15 @@ const userController = require('../controller/user.controller');
 const verifyToken = require('../middleware/authMiddleware');
 
 // User login
-router.post('/login',userController.login);
+router.post('/api/login', userController.login);
 
 // User registration
-router.post('/register', userController.register);
+router.post('/api/register', userController.register);
 
 // Forgot Password & Send Reset Email
-router.post('/forgotPassword', userController.forgotPassword);
-router.get('/home', userController.dashboard);
+router.post('/api/forgotPassword', userController.forgotPassword);
+
+// Dashboard
+router.get('/api/home', userController.dashboard);
 
 module.exports = router;

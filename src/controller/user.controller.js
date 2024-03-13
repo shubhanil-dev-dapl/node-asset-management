@@ -113,7 +113,7 @@ const login = async (req, res) => {
         const { username, password } = req.body;
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(401).json({ error: 'Authentication failed' });
+            return res.status(401).json({ error: 'User not found with this username' });
         }
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
@@ -125,7 +125,7 @@ const login = async (req, res) => {
         res.setHeader('Authorization', `Bearer ${token}`);
         res.status(200).json({ message: 'Login successfully.', token });
     } catch (error) {
-        res.status(500).json({ error: 'Login failed!' });
+        res.status(500).json({ error: 'Login failed! ' + error });
     }
 }
 
