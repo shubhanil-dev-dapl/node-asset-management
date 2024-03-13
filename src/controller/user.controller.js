@@ -1,6 +1,9 @@
 const sequelize = require('../config/database');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+
+// Model
+const { Op } = require('sequelize');
 const { User } = require('../model/user');
 
 // Validator
@@ -59,6 +62,51 @@ async function generateUniqueSlug(name) {
     return username;
 }
 
+// Forgot Password
+const forgotPassword = async (req, res) => {
+    try {
+        const validator = new Validator(req.body, {
+            email: 'required|email'
+        });
+        const matched = await validator.check();
+        if (!matched) {
+            return response(res, validator.errors, 'validation', 422);
+        }
+
+        let errors = {};
+        const { email } = req.body;
+
+        const user = await User.findOne({
+            where: {
+                [Op.and]: [
+                    { status: { [Op.eq]: 'active' } },
+                    { email: { [Op.eq]: email } }
+                ]
+            }
+        });
+        if (!user) {
+            errors['email'] = {
+                message: 'The email doesn\'t exists.',
+                rule: 'same'
+            };
+        }
+
+        if (Object.keys(errors).length) {
+            return response(res, errors, 'validation', 422);
+        }
+
+        user.resetCode = (Math.random() + 1).toString(36).substring(7);
+        user.resetExpiries = new Date(Date.now() + (1 * 60 * 60 * 1000)); // Expired in 1 hour;
+        await user.save();
+
+        // Mail
+
+        return response(res, user, 'Reset password mail has been sent.', 200);
+    } catch (error) {
+        return response(res, req.body, error.message, 500);
+    }
+}
+
 // User login
 const login = async (req, res) => {
     try {
@@ -80,7 +128,6 @@ const login = async (req, res) => {
     }
 }
 
-
 module.exports = {
-    register, login
+    register, forgotPassword, login
 }

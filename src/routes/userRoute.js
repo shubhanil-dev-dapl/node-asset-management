@@ -9,4 +9,7 @@ router.get('/login', verifyToken, userController.login);
 // User registration
 router.post('/register', userController.register);
 
+// Forgot Password & Send Reset Email
+router.post('/forgotPassword', userController.forgotPassword);
+
 module.exports = router;
