@@ -119,15 +119,26 @@ const login = async (req, res) => {
         if (!passwordMatch) {
             return res.status(401).json({ error: 'Authentication failed' });
         }
-        const token = jwt.sign({ userId: user._id }, 'your-secret-key', {
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
             expiresIn: '1h',
         });
+        res.setHeader('Authorization', `Bearer ${token}`);
         res.status(200).json({ message: 'Login successfully.', token });
     } catch (error) {
         res.status(500).json({ error: 'Login failed!' });
     }
 }
 
+const dashboard = async (req, res) => {
+    const token = req.headers['authorization'];
+    console.log(token)
+    try {
+        res.json({ message: 'Dashboard', token });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 module.exports = {
-    register, forgotPassword, login
+    register, login, forgotPassword, dashboard
 }

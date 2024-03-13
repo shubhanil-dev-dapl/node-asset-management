@@ -42,5 +42,5 @@ const userRouter = require('./routes/userRoute')
 app.use(userRouter)
 
 app.listen(process.env.PORT, () => {
-    console.log(`my server is running at @http://127.0.0.1:${process.env.PORT}`);
+    console.log(`my server is running at http://127.0.0.1:${process.env.PORT}`);
 })
