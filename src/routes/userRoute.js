@@ -3,6 +3,10 @@ const userController = require('../controller/user.controller');
 
 const verifyToken = require('../middleware/authMiddleware');
 
+// welcome
+router.get('/', (req, res) => {
+    res.send('welcome')
+})
 // User login
 router.post('/api/login', userController.login);
 

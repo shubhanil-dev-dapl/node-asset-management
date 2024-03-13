@@ -5,7 +5,7 @@ try {
     const sequelize = new Sequelize(
         process.env.DB_DATABASE || 'asset_management',
         process.env.DB_USERNAME || 'root',
-        process.env.DB_PASSWORD || 'Admin@#54321',
+        process.env.DB_PASSWORD || '',
         {
             host: process.env.DB_HOST || '127.0.0.1',
             dialect: process.env.DB_DRIVER || 'mysql'
