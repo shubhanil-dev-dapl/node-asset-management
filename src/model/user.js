@@ -6,11 +6,11 @@ const User = sequelize.define('users', {
         type: DataTypes.BIGINT,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: false
+        allowNull: true
     },
     firstName: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     lastName: {
         type: DataTypes.STRING,
@@ -29,7 +29,7 @@ const User = sequelize.define('users', {
     role: {
         type: DataTypes.ENUM('user', 'admin'),
         defaultValue: 'user',
-        allowNull: false
+        allowNull: true
     },
     token: {
         type: DataTypes.STRING,
@@ -37,22 +37,22 @@ const User = sequelize.define('users', {
     },
     password: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     username: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true
     },
     email: {
         type: DataTypes.STRING,
         unique: true,
-        allowNull: false
+        allowNull: true
     },
     mobile: {
         type: DataTypes.STRING,
         unique: true,
-        allowNull: false
+        allowNull: true
     },
     dateOfBirth: {
         type: DataTypes.DATEONLY,
@@ -60,7 +60,7 @@ const User = sequelize.define('users', {
     },
     gender: {
         type: DataTypes.ENUM('male', 'female'),
-        allowNull: false
+        allowNull: true
     },
     address: {
         type: DataTypes.TEXT,
@@ -98,14 +98,14 @@ const User = sequelize.define('users', {
     status: {
         type: DataTypes.ENUM('active', 'inactive', 'delete'),
         defaultValue: 'active',
-        allowNull: false
+        allowNull: true
     }
 });
 
 sequelize.sync({
     // alter: true
 }).then(() => {
-    console.log('Table synchronized successfully!');
+    console.log('User Table synchronized successfully!');
 }).catch((error) => {
     console.error('Unable to synchronized table: ', error);
 });
