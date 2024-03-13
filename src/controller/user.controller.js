@@ -19,31 +19,44 @@ const register = async (req, res) => {
             email: 'required|email',
             password: 'required',
         });
-        
+
         const matched = await validator.check();
         if (!matched) {
             return response(res, validator.errors, 'validation', 422);
         }
 
-        let errors = {};
         const {
             firstName, lastName, email, mobile, role, password, dateOfBirth, gender, address, city, country, postalCode, emergencyContactName, emergencyContactPhone
         } = req.body;
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const fullName = firstName + ' ' + ' ' + lastName;
-        const username = firstName + lastName.toLowerCase();
+        const fullName = `${firstName.toLowerCase()}-${lastName.toLowerCase()}`;
+        const username = await generateUniqueSlug(fullName);
 
-        const user = new User({
+        const user = await User.create({
             firstName, username, lastName, email, fullName, mobile, role, password: hashedPassword, dateOfBirth, gender, address, city, country, postalCode, emergencyContactName, emergencyContactPhone
         });
-        await user.save();
 
         res.status(201).json({ message: 'User registered successfully', data: user });
     } catch (error) {
         console.error('An error occurred during registration:', error);
         res.status(500).json({ message: 'An error occurred during registration', error: error.message });
     }
+}
+
+// Function to generate unique slug name
+async function generateUniqueSlug(name) {
+    let username = name;
+    let counter = (Math.random() + 1).toString(36).substring(7);
+    while (true) {
+        const existingUser = await User.findOne({ where: { username } });
+        if (!existingUser) {
+            break;
+        }
+        username = `${name}-${counter}`;
+        counter++;
+    }
+    return username;
 }
 
 // User login
@@ -58,30 +71,23 @@ const login = async (req, res) => {
         if (!passwordMatch) {
             return res.status(401).json({ error: 'Authentication failed' });
         }
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
             expiresIn: '1h',
         });
+        res.setHeader('Authorization', `Bearer ${token}`);
         res.status(200).json({ message: 'Login successfully.', token });
     } catch (error) {
         res.status(500).json({ error: 'Login failed!' });
     }
 }
 
-// Function to generate unique slug name
-async function generateUniqueSlug(name, index = 0) {
-    const slug = index === 0 ? name.toLowerCase().replace(/\s+/g, '-') : `${name.toLowerCase().replace(/\s+/g, '-')}-${index}`;
-    const existingUser = await User.findOne({ where: { username: slug } });
-    if (!existingUser) {
-        return slug;
-    }
-    return generateUniqueSlug(name, index + 1);
-}
-
-async function dashboard(req, res) {
+const dashboard = async (req, res) => {
+    const token = req.headers['authorization'];
+    console.log(token)
     try {
-        res.json({ message: 'Dashboard' , 'data': req.userId});
+        res.json({ message: 'Dashboard', token });
     } catch (error) {
-        throw error
+        res.status(500).json({ error: 'Internal server error' });
     }
 }
 

@@ -9,6 +9,6 @@ router.post('/login',userController.login);
 // User registration
 router.post('/register', userController.register);
 
-router.get('/home', verifyToken, userController.dashboard);
+router.get('/home', userController.dashboard);
 
 module.exports = router;
