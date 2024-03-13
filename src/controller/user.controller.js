@@ -58,7 +58,7 @@ const login = async (req, res) => {
         if (!passwordMatch) {
             return res.status(401).json({ error: 'Authentication failed' });
         }
-        const token = jwt.sign({ userId: user._id }, 'your-secret-key', {
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
             expiresIn: '1h',
         });
         res.status(200).json({ message: 'Login successfully.', token });
@@ -77,7 +77,14 @@ async function generateUniqueSlug(name, index = 0) {
     return generateUniqueSlug(name, index + 1);
 }
 
+async function dashboard(req, res) {
+    try {
+        res.json({ message: 'Dashboard' , 'data': req.userId});
+    } catch (error) {
+        throw error
+    }
+}
 
 module.exports = {
-    register, login
+    register, login , dashboard
 }
