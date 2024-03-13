@@ -7,15 +7,15 @@ try {
         process.env.DB_USERNAME || 'root',
         process.env.DB_PASSWORD || 'admin#123',
         {
-            host: process.env.DB_HOST || '0.0.0.0',
+            host: process.env.DB_HOST || '127.0.0.1',
             dialect: process.env.DB_DRIVER || 'mysql'
         }
     );
-    
+
     module.exports = {
         sequelize
     };
     console.log('Connection has been established successfully.');
-  } catch (error) {
+} catch (error) {
     console.error('Unable to connect to the database:', error);
-  }
+}

@@ -20,7 +20,7 @@ const User = sequelize.define('users', {
     fullName: {
         type: DataTypes.VIRTUAL,
         get() {
-            return `${this.name} ${this.lastName}`;
+            return `${this.firstName} ${this.lastName}`;
         },
         set(value) {
             throw new Error('Do not try to set the `fullName` value!');
@@ -41,7 +41,8 @@ const User = sequelize.define('users', {
     },
     username: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     email: {
         type: DataTypes.STRING,
@@ -59,11 +60,6 @@ const User = sequelize.define('users', {
     },
     gender: {
         type: DataTypes.ENUM('male', 'female'),
-        allowNull: false
-    },
-    primaryHand: {
-        type: DataTypes.ENUM('left', 'right'),
-        defaultValue: 'left',
         allowNull: false
     },
     address: {
