@@ -25,6 +25,7 @@ router.get('/', (req, res) => {
  *                 $ref: '#/components/schemas/Company'
  */
 router.post('/api/login', userController.login);
+router.post('/api/otpCheck', userController.otpCheck);
 
 // User registration
 router.post('/api/register', userController.register);
