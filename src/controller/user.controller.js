@@ -1,6 +1,7 @@
 const sequelize = require('../config/database');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Mail = require('../helpers/emailHelper');
 
 // Model
 const { Op } = require('sequelize');
@@ -39,7 +40,9 @@ const register = async (req, res) => {
         const user = await User.create({
             firstName, username, lastName, email, fullName, mobile, role, password: hashedPassword, dateOfBirth, gender, address, city, country, postalCode, emergencyContactName, emergencyContactPhone
         });
-
+        if(user) {
+            Mail.sendEmail(email, 'Registration Successful', 'Registration Successful', 'Hello, ' + firstName + ' ' + lastName + '<br> Your username is ' + user.username + ' and password is ' + password);
+        }
         res.status(201).json({ message: 'User registered successfully', data: user });
     } catch (error) {
         console.error('An error occurred during registration:', error);
