@@ -1,6 +1,12 @@
 const express = require('express')
 _ = require('underscore')
 require('dotenv').config()
+// // For Swagger
+// const swaggerJSDoc = require('swagger-jsdoc');
+
+// const swaggerUi = require('swagger-ui-express');
+// const swaggerSpec = require('../src/swagger/swagger');
+// const swaggerDocument = require('../src/swagger/swagger.yaml');
 
 const app = express()
 
@@ -31,6 +37,12 @@ sequelize.authenticate().then(() => {
 }).catch((error) => {
     console.error('Unable to connect to the database: ', error);
 });
+
+// Swagger UI endpoint
+// router.use('/api-docs', swaggerUi.serve);
+// router.get('/api-docs', swaggerUi.setup(swaggerDocument));
+// Serve Swagger documentation
+// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // routing path
 // Admin Router 

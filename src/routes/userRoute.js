@@ -4,6 +4,22 @@ const userController = require('../controller/user.controller');
 const verifyToken = require('../middleware/authMiddleware');
 
 // User login
+/**
+ * @swagger
+ * /api/companies:
+ *   get:
+ *     summary: Get all companies
+ *     description: Retrieve a list of all companies.
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Company'
+ */
 router.post('/api/login', userController.login);
 
 // User registration

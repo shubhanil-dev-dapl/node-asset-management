@@ -2,7 +2,7 @@ const sequelize = require('../../config/database');
 
 // Model
 const { Op } = require('sequelize');
-const { Company } = require('../../model/Company');
+const { Company } = require('../../model/company');
 
 // Common Response
 const { response } = require('../../config/response');
