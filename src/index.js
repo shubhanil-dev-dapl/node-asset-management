@@ -47,11 +47,12 @@ sequelize.authenticate().then(() => {
 // routing path
 // Admin Router 
 const adminRouter = require('./routes/admin');
-app.use('/admin', adminRouter)
+app.use('/api/admin', adminRouter)
 
 // User Router
 const userRouter = require('./routes/userRoute')
-app.use(userRouter)
+app.use('/api', userRouter)
+
 
 app.listen(process.env.PORT, () => {
     console.log(`my server is running at http://127.0.0.1:${process.env.PORT}`);
