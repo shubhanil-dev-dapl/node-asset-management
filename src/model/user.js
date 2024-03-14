@@ -50,9 +50,11 @@ const User = sequelize.define('users', {
         allowNull: true
     },
     mobile: {
-        type: DataTypes.STRING,
-        unique: true,
+        type: DataTypes.INTEGER,
         allowNull: true
+    },
+    otp: {
+        type: DataTypes.STRING,
     },
     dateOfBirth: {
         type: DataTypes.DATEONLY,
