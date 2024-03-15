@@ -1,6 +1,7 @@
 const sequelize = require('../config/database');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Mail = require('../helpers/emailHelper');
 
 // Model
 const { Op } = require('sequelize');
@@ -39,7 +40,9 @@ const register = async (req, res) => {
         const user = await User.create({
             firstName, username, lastName, email, fullName, mobile, role, password: hashedPassword, dateOfBirth, gender, address, city, country, postalCode, emergencyContactName, emergencyContactPhone
         });
-
+        if(user) {
+            Mail.sendEmail(email, 'Registration Successful', 'Registration Successful', 'Hello, ' + firstName + ' ' + lastName + '<br> Your username is ' + user.username + ' and password is ' + password);
+        }
         res.status(201).json({ message: 'User registered successfully', data: user });
     } catch (error) {
         console.error('An error occurred during registration:', error);
@@ -111,7 +114,7 @@ const forgotPassword = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { username, password } = req.body;
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ where: { username: username } });
         if (!user) {
             return res.status(401).json({ error: 'User not found with this username' });
         }
@@ -119,13 +122,56 @@ const login = async (req, res) => {
         if (!passwordMatch) {
             return res.status(401).json({ error: 'Authentication failed' });
         }
+        // date time format
+        let current = new Date();
+        let cDate = current.getFullYear() + '-' + (current.getMonth() + 1) + '-' + current.getDate();
+        let cTime = current.getHours() + ":" + current.getMinutes() + ":" + current.getSeconds();
+        let dateTime = cDate + ' ' + cTime;
+
+        // save otp and otp created at
+        user.otp = Math.floor(100000 + Math.random() * 900000);
+        user.otpCreatedAt = dateTime;
+        await user.save();
+
+        // send otp in email
+        Mail.sendEmail(user.email, 'Login OTP', 'Login OTP', 'Hello, ' + user.firstName + ' ' + user.lastName + '<br> Your login OTP is ' + user.otp + '.<br> OTP will expire in 1 minute.');
+        res.status(200).json({ message: 'OTP sent successfully to ' + user.email + '.'});
+    } catch (error) {
+        res.status(500).json({ error: 'Login failed! ' + error });
+    }
+}
+const otpCheck = async (req, res) => {
+    try {
+        const { otp } = req.body;
+        const user = await User.findOne({where: {otp: otp}});
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid OTP' });
+        }
+        // Check if OTP is still valid (within 1 minutes)
+        const min = 1 ; // 1 minute
+        const otpCreationTime = user.otpCreatedAt; 
+        const otpExpirationTime = new Date(otpCreationTime.getTime() + min * 60000); 
+        const currentTime = new Date();
+
+        // Check if OTP has expired
+        if (currentTime > otpExpirationTime) {
+            return res.status(401).json({ error: 'OTP expired' });
+        }
+        // otp null after login
+        user.otp = null;
+        user.otpCreatedAt = null;
+        await user.save();
+
+        // generate token after login
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
             expiresIn: '1h',
         });
         res.setHeader('Authorization', `Bearer ${token}`);
+        
         res.status(200).json({ message: 'Login successfully.', token });
+        Mail.sendEmail(user.email, 'Login Successful', 'Login Successful', 'Hello, ' + user.firstName + ' ' + user.lastName + '<br> Your login has been successful.');
     } catch (error) {
-        res.status(500).json({ error: 'Login failed! ' + error });
+        res.status(500).json({ error: 'OTP verification failed! ' + error });
     }
 }
 
@@ -140,5 +186,5 @@ const dashboard = async (req, res) => {
 }
 
 module.exports = {
-    register, login, forgotPassword, dashboard
+    register, login, forgotPassword,otpCheck, dashboard
 }
