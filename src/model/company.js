@@ -6,7 +6,7 @@ const Company = sequelize.define('companies', {
         type: DataTypes.BIGINT,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: true
+        allowNull: false
     },
     name: {
         type: DataTypes.STRING,
