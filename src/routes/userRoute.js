@@ -3,6 +3,10 @@ const userController = require('../controller/user.controller');
 
 const verifyToken = require('../middleware/authMiddleware');
 
+// welcome
+router.get('/', (req, res) => {
+    res.send('welcome')
+})
 // User login
 /**
  * @swagger
@@ -21,6 +25,7 @@ const verifyToken = require('../middleware/authMiddleware');
  *                 $ref: '#/components/schemas/Company'
  */
 router.post('/login', userController.login);
+router.post('/otpCheck', userController.otpCheck);
 
 // User registration
 router.post('/register', userController.register);

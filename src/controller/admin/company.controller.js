@@ -87,7 +87,7 @@ const createCompany = async (req, res) => {
 const getAllCompanies = async (req, res) => {
     try {
         const companies = await Company.find();
-        res.json({ data: companies });
+        res.status(201).json({ message: 'Companies are : ', data: companies });
     } catch (error) {
         res.status(500).json({ message: 'An error occurred while fetching companies', error: error.message });
     }
@@ -129,9 +129,9 @@ const updateCompanyById = async (req, res) => {
 }
 
 
-
 // Delete a company
 const deleteCompany = async (req, res) => {
+    console.log('companyId', req.params);
     try {
         const companyId = req.params.id;
 

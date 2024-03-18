@@ -9,8 +9,8 @@ require('dotenv').config()
 // const swaggerDocument = require('../src/swagger/swagger.yaml');
 
 const app = express()
-
 const path = require('path')
+const port = process.env.PORT || 3000
 
 express.static(path.join(__dirname, "public"))
 
@@ -54,6 +54,6 @@ const userRouter = require('./routes/userRoute')
 app.use('/api', userRouter)
 
 
-app.listen(process.env.PORT, () => {
-    console.log(`my server is running at http://127.0.0.1:${process.env.PORT}`);
+app.listen(port, () => {
+    console.log(`my server is running at 'http://localhost:${port}`);
 })
