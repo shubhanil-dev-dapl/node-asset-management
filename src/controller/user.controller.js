@@ -134,7 +134,7 @@ const login = async (req, res) => {
         await user.save();
 
         // send otp in email
-        Mail.sendEmail(user.email, 'Login OTP', 'Login OTP', 'Hello, ' + user.firstName + ' ' + user.lastName + '<br> Your login OTP is ' + user.otp + '.<br> OTP will expire in 1 minute.');
+        Mail.sendEmail(user.email, 'Login OTP', 'Login OTP', 'Hello, ' + user.firstName + ' ' + user.lastName + '<br> Your login OTP is ' + user.otp + '.<br> OTP will expire in 2 minute.');
         res.status(200).json({ message: 'OTP sent successfully to ' + user.email + '.'});
     } catch (error) {
         res.status(500).json({ error: 'Login failed! ' + error });
@@ -148,7 +148,7 @@ const otpCheck = async (req, res) => {
             return res.status(401).json({ error: 'Invalid OTP' });
         }
         // Check if OTP is still valid (within 1 minutes)
-        const min = 1 ; // 1 minute
+        const min = 2 ; // 1 minute
         const otpCreationTime = user.otpCreatedAt; 
         const otpExpirationTime = new Date(otpCreationTime.getTime() + min * 60000); 
         const currentTime = new Date();
