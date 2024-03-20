@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 const adminControler = require('../../controller/admin/index');
 const companyController = require('../../controller/admin/company.controller');
-const { uploadImg } = require('../../middleware/imageUpload')
+const { uploadImg } = require('../../helpers/imageUpload')
 
 const verifyToken = require('../../middleware/authMiddleware');
 
@@ -12,6 +12,7 @@ router.get('/companies', verifyToken, companyController.getAllCompanies);
 
 // Company Store with Single Image
 router.post('/company/store', uploadImg.single('logo'), verifyToken, companyController.createCompany);
+
 // with Multple image
 // router.post('/company/store', uploads.array('logo', 4), verifyToken, companyController.createCompany);
 
