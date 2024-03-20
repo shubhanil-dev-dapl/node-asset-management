@@ -2,41 +2,28 @@ const router = require('express').Router();
 
 const adminControler = require('../../controller/admin/index');
 const companyController = require('../../controller/admin/company.controller');
+const { uploadImg } = require('../../helpers/imageUpload')
 
 const verifyToken = require('../../middleware/authMiddleware');
 
-/**
- * @swagger
- * /api/companies:
- *   get:
- *     summary: Get all companies
- *     description: Retrieve a list of all companies.
- *     responses:
- *       '200':
- *         description: Successful operation
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Company'
- */
-router.get('/api/companies', companyController.getAllCompanies);
 
 // get all Company
-// router.get('/api/companies', companyController.getAllCompanies);
+router.get('/companies', verifyToken, companyController.getAllCompanies);
 
-// Company Store
-router.post('/api/company/store', companyController.createCompany);
+// Company Store with Single Image
+router.post('/company/store', uploadImg.single('logo'), verifyToken, companyController.createCompany);
+
+// with Multple image
+// router.post('/company/store', uploads.array('logo', 4), verifyToken, companyController.createCompany);
 
 // View Company
-router.get('/api/company/:id', companyController.getCompanyById);
+router.get('/company/:id', companyController.getCompanyById);
 
 // Company Delete
-router.delete('/api/company/delete/:id', companyController.deleteCompany);
+router.delete('/company/delete/:id', companyController.deleteCompany);
 
 // Admin dashboard
-router.get('/api/admin-dashboard', adminControler.homePage);
+router.get('/admin-dashboard', adminControler.homePage);
 
 
 module.exports = router;
