@@ -40,6 +40,14 @@ module.exports = function (sequelize, DataTypes) {
                 type: Sequelize.ENUM('active', 'inactive', 'pending'),
                 allowNull: true,
             },
+            createdAt: {
+                type: DataTypes.DATE,
+                allowNull: true
+            },
+            updatedAt: {
+                type: DataTypes.DATE,
+                allowNull: true
+            },
             deletedAt: {
                 type: DataTypes.DATE,
             },

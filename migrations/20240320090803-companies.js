@@ -57,6 +57,14 @@ module.exports = {
         type: DataTypes.ENUM('active', 'inactive', 'deleted'),
         defaultValue: 'active',
         allowNull: true
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: true
       }
     });
   },
