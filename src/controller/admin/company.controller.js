@@ -83,7 +83,7 @@ const createCompany = async (req, res) => {
         res.status(201).json({ message: 'Company created successfully', data: company });
 
     } catch (error) {
-            res.status(500).json({ message: 'An error occurred during company registration', error: error.message });
+        res.status(500).json({ message: 'An error occurred during company registration', error: error.message });
     }
 }
 
@@ -106,7 +106,7 @@ const getCompanyById = async (req, res) => {
     try {
         const companyId = req.params.id;
 
-        const company = await Company.findById(companyId);
+        const company = await Company.findOne({ where: { id: companyId } });
 
         if (!company) {
             return res.status(404).json({ message: 'Company not found' });
@@ -117,33 +117,67 @@ const getCompanyById = async (req, res) => {
         res.status(500).json({ message: 'An error occurred while fetching company', error: error.message });
     }
 }
-
 
 // Update company by ID
 const updateCompanyById = async (req, res) => {
     try {
-        const companyId = req.params.id;
+        let errors = {};
+        const { id } = req.params;
+        const { name, email, phone, logo, address, city, country, postalCode } = req.body;
 
-        const company = await Company.findById(companyId);
+        // Check if the company with the given ID exists
+        const company = await Company.findOne({ where: { id: id } });
 
-        if (!company) {
-            return res.status(404).json({ message: 'Company not found' });
+        const emailCount = await Company.count({
+            where: {
+                [Op.and]: [
+                    { email: { [Op.eq]: email } },
+                    { id: { [Op.ne]: id } }
+                ]
+            }
+        });
+        if (emailCount > 0) {
+            errors['email'] = {
+                message: 'The email already exists.',
+                rule: 'unique'
+            };
         }
 
-        res.json({ data: company });
-    } catch (error) {
-        res.status(500).json({ message: 'An error occurred while fetching company', error: error.message });
-    }
-}
+        if (Object.keys(errors).length) {
+            return response(res, errors, 'validation', 422);
+        }
 
+        if (!company) {
+            return response(res, { message: 'Company not found' }, 'error', 404);
+        }
+
+        // Update company data
+        company.name = name || company.name;
+        company.email = email || company.email;
+        company.phone = phone || company.phone;
+        company.logo = logo ? req.file.filename : company.logo;
+        company.address = address || company.address;
+        company.city = city || company.city;
+        company.country = country || company.country;
+        company.postalCode = postalCode || company.postalCode;
+        await company.save();
+
+        res.status(200).json({ message: 'Company updated successfully', data: company });
+    } catch (error) {
+        res.status(500).json({ message: 'An error occurred during company update', error: error.message });
+    }
+};
 
 // Delete a company
 const deleteCompany = async (req, res) => {
-    console.log('companyId', req.params);
     try {
         const companyId = req.params.id;
 
-        const deletedCompany = await Company.findByIdAndDelete(companyId);
+        const deletedCompany = await Company.destroy({
+            where: {
+                id: companyId
+            },
+        });
 
         if (!deletedCompany) {
             return res.status(404).json({ message: 'Company not found' });
