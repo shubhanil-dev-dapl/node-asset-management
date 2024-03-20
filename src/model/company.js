@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
+// This is not working now.. we have started migration.
 const Company = sequelize.define('companies', {
     id: {
         type: DataTypes.BIGINT,
@@ -44,7 +45,7 @@ const Company = sequelize.define('companies', {
         allowNull: true
     },
     status: {
-        type: DataTypes.ENUM('active', 'inactive', 'delete'),
+        type: DataTypes.ENUM('active', 'inactive', 'deleted'),
         defaultValue: 'active',
         allowNull: true
     }
