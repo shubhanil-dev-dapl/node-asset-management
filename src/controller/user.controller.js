@@ -2,6 +2,10 @@ const sequelize = require('../config/database');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Mail = require('../helpers/emailHelper');
+const ip = require("ip");
+
+// get Device details
+const DeviceDetector = require('node-device-detector');
 
 // Model
 const { Op } = require('sequelize');
@@ -40,7 +44,7 @@ const register = async (req, res) => {
         const user = await User.create({
             firstName, username, lastName, email, fullName, mobile, role, password: hashedPassword, dateOfBirth, gender, address, city, country, postalCode, emergencyContactName, emergencyContactPhone
         });
-        if(user) {
+        if (user) {
             Mail.sendEmail(email, 'Registration Successful', 'Registration Successful', 'Hello, ' + firstName + ' ' + lastName + '<br> Your username is ' + user.username + ' and password is ' + password);
         }
         res.status(201).json({ message: 'User registered successfully', data: user });
@@ -133,29 +137,47 @@ const login = async (req, res) => {
         user.otpCreatedAt = dateTime;
         await user.save();
 
+
+        // Create an instance of DeviceDetector
+        const detector = new DeviceDetector();
+
+        // User agent string of the device you want to detect
+        const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';
+
+        // Parse the user agent string to detect device details
+        const deviceInfo = detector.detect(userAgent);
+
         // send otp in email
-        Mail.sendEmail(user.email, 'Login OTP', 'Login OTP', 'Hello, ' + user.firstName + ' ' + user.lastName + '<br> Your login OTP is ' + user.otp + '.<br> OTP will expire in 2 minute.');
-        res.status(200).json({ message: 'OTP sent successfully to ' + user.email + '.'});
+        Mail.sendEmail(user.email, 'Login OTP', 'Login OTP', 'Hello, ' + user.firstName + ' ' + user.lastName + '<br> Your login OTP is ' + user.otp + '.<br> OTP will expire in 5 minute.<br><br><p>Login attempt in *OS-' + deviceInfo.os.name + '* from ' + deviceInfo.device.type + ' (' + ip.address() + ')' + '</p>');
+
+        res.status(200).json({ message: 'OTP sent successfully to ' + user.email + '.' });
     } catch (error) {
         res.status(500).json({ error: 'Login failed! ' + error });
     }
 }
+
 const otpCheck = async (req, res) => {
     try {
         const { otp } = req.body;
-        const user = await User.findOne({where: {otp: otp}});
+        const user = await User.findOne({ where: { otp: otp } });
         if (!user) {
             return res.status(401).json({ error: 'Invalid OTP' });
         }
-        // Check if OTP is still valid (within 1 minutes)
-        const min = 2 ; // 1 minute
-        const otpCreationTime = user.otpCreatedAt; 
-        const otpExpirationTime = new Date(otpCreationTime.getTime() + min * 60000); 
+        // Check if OTP is still valid (within 5 minutes)
+        const min = 5; // 5 minute
+        const otpCreationTime = user.otpCreatedAt;
+        const otpExpirationTime = new Date(otpCreationTime.getTime() + min * 60000);
         const currentTime = new Date();
 
         // Check if OTP has expired
         if (currentTime > otpExpirationTime) {
-            return res.status(401).json({ error: 'OTP expired' });
+            // res.setHeader('user_id', `${user.id}`);
+            // let baseUrl = `http://localhost:${process.env.PORT}/api/resend-otp`;
+            // let clickHere = `<a href=${baseUrl}>Click Here</a>`;
+            return res.status(401).json(
+                // { error: `OTP expired! ${clickHere} to resend OTP` }
+                { error: `OTP expired! Please login again.` }
+            );
         }
         // otp null after login
         user.otp = null;
@@ -167,7 +189,7 @@ const otpCheck = async (req, res) => {
             expiresIn: '1h',
         });
         res.setHeader('Authorization', `Bearer ${token}`);
-        
+
         res.status(200).json({ message: 'Login successfully.', token });
         Mail.sendEmail(user.email, 'Login Successful', 'Login Successful', 'Hello, ' + user.firstName + ' ' + user.lastName + '<br> Your login has been successful.');
     } catch (error) {
@@ -185,6 +207,44 @@ const dashboard = async (req, res) => {
     }
 }
 
+const resendOTP = async (req, res) => {
+    try {
+        const { otp } = req.body;
+        const user = await User.findOne({ where: { otp: otp } });
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid OTP' });
+        }
+        // Check if OTP is still valid (within 5 minutes)
+        const min = 5; // 5 minute
+        const otpCreationTime = user.otpCreatedAt;
+        const otpExpirationTime = new Date(otpCreationTime.getTime() + min * 60000);
+        const currentTime = new Date();
+
+        let baseUrl = `http://localhost:${port}/api/resend-otp`;
+        let clickHere = `<a href=${baseUrl}>Click Here</a>`;
+        // Check if OTP has expired
+        if (currentTime > otpExpirationTime) {
+            return res.status(401).json({ error: `OTP expired! ${clickHere} to resend OTP` });
+        }
+        // otp null after login
+        user.otp = null;
+        user.otpCreatedAt = null;
+        await user.save();
+
+        // generate token after login
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+            expiresIn: '1h',
+        });
+        res.setHeader('Authorization', `Bearer ${token}`);
+
+        res.status(200).json({ message: 'Login successfully.', token });
+        Mail.sendEmail(user.email, 'Login Successful', 'Login Successful', 'Hello, ' + user.firstName + ' ' + user.lastName + '<br> Your login has been successful.');
+    } catch (error) {
+        res.status(500).json({ error: 'OTP verification failed! ' + error });
+    }
+}
+
+
 module.exports = {
-    register, login, forgotPassword,otpCheck, dashboard
+    register, login, forgotPassword, otpCheck, dashboard, resendOTP
 }

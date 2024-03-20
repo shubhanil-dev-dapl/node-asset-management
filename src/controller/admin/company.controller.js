@@ -1,5 +1,8 @@
 const sequelize = require('../../config/database');
 
+const fs = require("fs");
+
+
 // Model
 const { Op } = require('sequelize');
 const { Company } = require('../../model/company');
@@ -13,6 +16,7 @@ const { Validator } = require('node-input-validator');
 // company registration
 const createCompany = async (req, res) => {
     try {
+        // console.log(req.file.filename);
         const { name, email, phone, logo, address, city, country, postalCode } = req.body;
 
         const validator = new Validator(req.body, {
@@ -69,7 +73,7 @@ const createCompany = async (req, res) => {
         company.name = name;
         company.email = email;
         company.phone = phone;
-        company.logo = logo;
+        company.logo = req.file.filename;
         company.address = address;
         company.city = city;
         company.country = country;
@@ -79,15 +83,19 @@ const createCompany = async (req, res) => {
         res.status(201).json({ message: 'Company created successfully', data: company });
 
     } catch (error) {
-        res.status(500).json({ message: 'An error occurred during company registration', error: error.message });
+            res.status(500).json({ message: 'An error occurred during company registration', error: error.message });
     }
 }
 
 // Get all companies
 const getAllCompanies = async (req, res) => {
     try {
-        const companies = await Company.find();
-        res.status(201).json({ message: 'Companies are : ', data: companies });
+        const companies = await Company.findAll();
+        if (companies.length > 0) {
+            res.status(201).json({ message: 'Companies are : ', data: companies });
+        } else {
+            res.status(201).json({ message: 'Now, there have no company.' });
+        }
     } catch (error) {
         res.status(500).json({ message: 'An error occurred while fetching companies', error: error.message });
     }

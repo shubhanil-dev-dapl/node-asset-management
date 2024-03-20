@@ -26,6 +26,7 @@ router.get('/', (req, res) => {
  */
 router.post('/login', userController.login);
 router.post('/otpCheck', userController.otpCheck);
+router.post('/resend-otp', userController.resendOTP);
 
 // User registration
 router.post('/register', userController.register);
