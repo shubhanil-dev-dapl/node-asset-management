@@ -24,16 +24,17 @@ router.get('/', (req, res) => {
  *               items:
  *                 $ref: '#/components/schemas/Company'
  */
-router.post('/api/login', userController.login);
-router.post('/api/otpCheck', userController.otpCheck);
+router.post('/login', userController.login);
+router.post('/otpCheck', userController.otpCheck);
+router.post('/resend-otp', userController.resendOTP);
 
 // User registration
-router.post('/api/register', userController.register);
+router.post('/register', userController.register);
 
 // Forgot Password & Send Reset Email
-router.post('/api/forgotPassword', userController.forgotPassword);
+router.post('/forgotPassword', userController.forgotPassword);
 
 // Dashboard
-router.get('/api/home', userController.dashboard);
+router.get('/home', userController.dashboard);
 
 module.exports = router;

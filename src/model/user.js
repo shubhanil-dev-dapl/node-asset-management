@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-
+// This is Working Now.. we didn't have started migration yet in this model
 const User = sequelize.define('users', {
     id: {
         type: DataTypes.BIGINT,
