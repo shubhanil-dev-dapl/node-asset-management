@@ -1,4 +1,4 @@
-const sequelize = require('../config/database');
+
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Mail = require('../helpers/emailHelper');
@@ -236,6 +236,10 @@ const resendOTP = async (req, res) => {
             expiresIn: '1h',
         });
         res.setHeader('Authorization', `Bearer ${token}`);
+
+        const mailBody = `
+        
+        `;
 
         res.status(200).json({ message: 'Login successfully.', token });
         Mail.sendEmail(user.email, 'Login Successful', 'Login Successful', 'Hello, ' + user.firstName + ' ' + user.lastName + '<br> Your login has been successful.');

@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const { dbConnection } = require('../config/database');
 
 // This is not working now.. we have started migration.
-const Company = sequelize.define('companies', {
+const Company = dbConnection.define('companies', {
     id: {
         type: DataTypes.BIGINT,
         autoIncrement: true,
@@ -51,7 +51,7 @@ const Company = sequelize.define('companies', {
     }
 });
 
-sequelize.sync({
+dbConnection.sync({
     // alter: true
 }).then(() => {
     console.log('Company Table synchronized successfully!');

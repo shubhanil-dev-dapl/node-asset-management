@@ -5,7 +5,8 @@ const fs = require("fs");
 
 // Model
 const { Op } = require('sequelize');
-const { Company } = require('../../model/company');
+// const { Company } = require('../../model/company');
+const { Company } = require('../../../models/Company');
 
 // Common Response
 const { response } = require('../../config/response');

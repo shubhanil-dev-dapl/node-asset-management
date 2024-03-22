@@ -30,9 +30,9 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 // database connect
-const { sequelize } = require('./config/database');
+const { dbConnection } = require('./config/database');
 
-sequelize.authenticate().then(() => {
+dbConnection.authenticate().then(() => {
     console.log('Connection has been established successfully.');
 }).catch((error) => {
     console.error('Unable to connect to the database: ', error);

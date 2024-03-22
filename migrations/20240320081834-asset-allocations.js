@@ -3,14 +3,9 @@
 const { DataTypes } = require('sequelize');
 
 /** @type {import('sequelize-cli').Migration} */
+
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    /**
-     * Add altering commands here.
-     *
-     * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
-     */
+  up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('asset_allocations',
       {
         id: {
@@ -29,43 +24,36 @@ module.exports = {
         },
         allocationFromDate: {
           type: DataTypes.DATE,
-          allowNull: false,
+          allowNull: true,
         },
         allocationToDate: {
           type: DataTypes.DATE,
-          allowNull: false,
-          defaultValue: DataTypes.DATE,
+          allowNull: true,
         },
         allocatedBy: {
           type: DataTypes.INTEGER,
           allowNull: true,
         },
         status: {
-          type: Sequelize.ENUM('active', 'inactive', 'pending'),
+          type: DataTypes.ENUM('active', 'inactive', 'pending'),
           allowNull: true,
         },
         createdAt: {
           type: DataTypes.DATE,
-          allowNull: true
+          defaultValue: DataTypes.NOW,
         },
         updatedAt: {
           type: DataTypes.DATE,
-          allowNull: true
+          defaultValue: DataTypes.NOW,
         },
         deletedAt: {
           type: DataTypes.DATE,
+          allowNull: true,
         },
       }
     );
   },
-
-  async down(queryInterface, Sequelize) {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
+  down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('asset_allocations');
   }
 };
