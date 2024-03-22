@@ -1,51 +1,49 @@
 // models/AssetCategoryType.js
 "use strict";
 
-const secrets = [
+const { DataTypes } = require('sequelize');
+const { dbConnection } = require('../src/config/database');
 
-];
-
-module.exports = function (sequelize, DataTypes) {
-    const AssetCategoryType = sequelize.define(
-        "asset_category_type",
-        {
-            id: {
-                type: Sequelize.INTEGER,
-                primaryKey: true,
-                autoIncrement: true
-            },
-            name: {
-                type: Sequelize.STRING,
-                allowNull: true
-            },
-            slug: {
-                type: Sequelize.STRING,
-                allowNull: true
-            },
-            createdAt: {
-                type: Sequelize.DATE,
-                allowNull: true
-            },
-            updatedAt: {
-                type: Sequelize.DATE,
-                allowNull: true
-            }
+const AssetCategoryType = dbConnection.define(
+    "asset_category_types",
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
         },
-        {
-            timestamps: true,
-            paranoid: true,
+        name: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        slug: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: true
         }
-    );
+    },
+    {
+        timestamps: true,
+        paranoid: true,
+    }
+);
 
-    AssetCategoryType.prototype.purge = function () {
-        const clean = {};
-        for (const key of Object.keys(this.dataValues)) {
-            if (!secrets.includes(key)) {
-                clean[key] = this.dataValues[key];
-            }
-        }
-        return clean;
-    };
 
-    return AssetCategoryType;
+dbConnection.sync({
+}).then(() => {
+    console.log('Asset Category Type Table synchronized successfully!');
+}).catch((error) => {
+    console.error('Unable to synchronized table: ', error);
+});
+
+
+module.exports = {
+    AssetCategoryType
 };

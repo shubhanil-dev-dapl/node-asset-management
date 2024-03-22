@@ -11,12 +11,15 @@ const { Validator } = require('node-input-validator');
 
 
 // Get all alloted Assets
-const getAllAllotedAssets = async (req, res) => {
+const getAllotedAssets = async (req, res) => {
     try {
 
         const allotedAssets = await AssetAllocation.findAll();
-
-        res.status(200).json({ message: 'Alloted asset lists fetched successfully', data: allotedAssets });
+        if (allotedAssets.length > 0) {
+            res.status(200).json({ message: 'Alloted asset lists fetched successfully', data: allotedAssets });
+        } else {
+            res.status(200).json({ message: 'Alloted asset fetched successfully', data: 'No data found.' });
+        }
     } catch (error) {
         console.error('Error fetching alloted assets:', error);
         res.status(500).json({ message: 'An error occurred while fetching alloted asset lists', error: error.message });
@@ -75,14 +78,14 @@ const assetAllocation = async (req, res) => {
 
 
 // Get alloted asset by ID
-const getallotedAssetById = async (req, res) => {
+const getAllotedAssetById = async (req, res) => {
     try {
         const assetId = req.params.id;
 
         const allotedAsset = await AssetAllocation.findOne({ where: { id: assetId } });
 
         if (!allotedAsset) {
-            return res.status(404).json({ message: 'Alloted asset not found' });
+            return res.status(404).json({ message: `Alloted asset not found with this id : ${assetId}` });
         }
 
         res.json({ data: allotedAsset });
@@ -92,28 +95,81 @@ const getallotedAssetById = async (req, res) => {
 }
 
 
-// Delete a company
-const deleteCompany = async (req, res) => {
+// Update Asset Type by ID
+const updateAllotedAssetById = async (req, res) => {
     try {
-        const companyId = req.params.id;
+        const { id } = req.params;
 
-        const deletedCompany = await Company.destroy({
+        const { assetId, userId, allocationFromDate, allocationToDate, allocatedBy } = req.body;
+
+        const validator = new Validator(req.body, {
+            assetId: 'required',
+            userId: 'required',
+        });
+
+        const matched = await validator.check();
+        if (!matched) {
+            return response(res, validator.errors, 'validation', 422);
+        }
+
+        let errors = {};
+
+        const allotedAsset = await AssetAllocation.findOne({ where: { id: id } });
+
+        const assetIdCount = await AssetAllocation.findOne({
             where: {
-                id: companyId
+                [Op.and]: [
+                    { assetId: { [Op.eq]: assetId } },
+                ]
+            }
+        });
+
+        if (assetIdCount.length > 0) {
+            errors['assetId'] = {
+                message: `The asset_id : ${assetIdCount.assetId} already alloted to this user, user_id : ${allotedAsset.userId}.`,
+            };
+        }
+
+        if (Object.keys(errors).length > 0) {
+            return response(res, errors, 'validation', 422);
+        }
+
+        // Update company data
+        allotedAsset.assetId = assetId;
+        allotedAsset.userId = userId;
+        // allotedAsset.allocationFromDate = allocationFromDate ?? '';
+        // allotedAsset.allocationToDate = allocationToDate ?? '';
+        allotedAsset.allocatedBy = allocatedBy;
+       await allotedAsset.save();
+
+        res.status(200).json({ message: 'Asset alloted updated successfully. Need to change for validation', data: allotedAsset });
+    } catch (error) {
+        res.status(500).json({ message: 'An error occurred during Asset allocation update', error: error.message });
+    }
+};
+
+// Delete a alloted Asset
+const deleteAllotedAssetById = async (req, res) => {
+    try {
+        const allotedAssetId = req.params.id;
+
+        const allotedAsset = await AssetAllocation.destroy({
+            where: {
+                id: allotedAssetId
             },
         });
 
-        if (!deletedCompany) {
-            return res.status(404).json({ message: 'Company not found' });
+        if (!allotedAsset) {
+            return res.status(404).json({ message: `alloted asset not found with this id : ${allotedAssetId}` });
         }
 
-        res.json({ message: 'Company deleted successfully', data: deletedCompany });
+        res.json({ message: 'Alloted asset deleted successfully', data: allotedAsset });
     } catch (error) {
-        res.status(500).json({ message: 'An error occurred during company deletion', error: error.message });
+        res.status(500).json({ message: 'An error occurred during alloted asset deletion', error: error.message });
     }
 }
 
 
 module.exports = {
-    getAllAllotedAssets, assetAllocation, getallotedAssetById
+    getAllotedAssets, assetAllocation, getAllotedAssetById, updateAllotedAssetById, deleteAllotedAssetById
 }

@@ -25,4 +25,4 @@ const uploadImg = multer({
     },
     limits: maxSize
 })
-module.exports = {uploadImg}
+module.exports = { uploadImg }
