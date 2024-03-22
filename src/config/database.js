@@ -2,7 +2,7 @@ const { Sequelize } = require('sequelize');
 
 try {
     // await sequelize.authenticate();
-    const sequelize = new Sequelize(
+    const dbConnection = new Sequelize(
         process.env.DB_DATABASE || 'asset_management',
         process.env.DB_USERNAME || 'root',
         process.env.DB_PASSWORD || '',
@@ -13,7 +13,7 @@ try {
     );
 
     module.exports = {
-        sequelize
+        dbConnection
     };
     console.log('Connection has been established successfully.');
 } catch (error) {
