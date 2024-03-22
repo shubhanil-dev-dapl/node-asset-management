@@ -6,8 +6,12 @@ const verifyToken = require('../../middleware/authMiddleware');
 const adminControler = require('../../controller/admin/index');
 const companyController = require('../../controller/admin/company.controller');
 const assetAllocationController = require('../../controller/admin/assetAllocation.controller');
+const assetController = require('../../controller/admin/assetController');
 const assetTypesController = require('../../controller/admin/assetCategoryType.controller')
 
+
+//store asset
+router.post('/asset/store', assetController.storeAsset);
 
 // get all Company
 router.get('/companies', companyController.getAllCompanies);
