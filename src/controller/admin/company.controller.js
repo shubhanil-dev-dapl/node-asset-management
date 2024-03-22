@@ -110,7 +110,7 @@ const getCompanyById = async (req, res) => {
         const company = await Company.findOne({ where: { id: companyId } });
 
         if (!company) {
-            return res.status(404).json({ message: 'Company not found' });
+            return res.status(404).json({ message: `Company not found with this id : ${companyId}` });
         }
 
         res.json({ data: company });
@@ -149,7 +149,7 @@ const updateCompanyById = async (req, res) => {
         }
 
         if (!company) {
-            return response(res, { message: 'Company not found' }, 'error', 404);
+            return response(res, { message: `Company not found with this id : ${id}` }, 'error', 404);
         }
 
         // Update company data
