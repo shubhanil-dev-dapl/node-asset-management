@@ -1,8 +1,9 @@
 // models/AssetCategoryType.js
 "use strict";
 
-const { DataTypes } = require('sequelize');
+const { DataTypes,HasMany } = require('sequelize');
 const { dbConnection } = require('../src/config/database');
+const { Asset } = require('./Asset');
 
 const AssetCategoryType = dbConnection.define(
     "asset_category_types",
@@ -42,7 +43,6 @@ dbConnection.sync({
 }).catch((error) => {
     console.error('Unable to synchronized table: ', error);
 });
-
 
 module.exports = {
     AssetCategoryType

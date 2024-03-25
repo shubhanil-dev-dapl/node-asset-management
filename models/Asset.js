@@ -1,7 +1,8 @@
 "use strict";
 
-const { DataTypes } = require('sequelize');
+const { DataTypes,BelongsTo } = require('sequelize');
 const { dbConnection } = require('../src/config/database');
+const { AssetCategoryType } = require('./AssetCategoryType');
 
 const Asset = dbConnection.define('assets',
     {
