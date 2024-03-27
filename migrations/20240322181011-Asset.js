@@ -1,8 +1,9 @@
 'use strict';
+const { DataTypes } = require('sequelize');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     /**
      * Add altering commands here.
      *
@@ -15,67 +16,71 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: DataTypes.INTEGER
       },
       name: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: true
       },
       slug: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: true
       },
       category_type_id: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         allowNull: true,
         defaultValue: 0
       },
       purchase_date: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         allowNull: true
       },
       purchase_from: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: true
       },
       warrenty_till_date: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         allowNull: true
       },
       asset_code: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: true,
         unique: true
       },
       invoice_copy: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: true
       },
       images: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: true
       },
       status: {
-        type: Sequelize.TINYINT,
+        type: DataTypes.TINYINT,
         defaultValue: 1,
         comment: '1=Working, 2= Partially working, 3= Damaged'
       },
       createdAt: {
         allowNull: true,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       },
       updatedAt: {
         allowNull: true,
-        type: Sequelize.DATE
-      }
+        type: DataTypes.DATE
+      },
+      deletedAt: {
+        type: DataTypes.DATE,
+      },
     })
   },
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     /**
      * Add reverting commands here.
      *
      * Example:
      * await queryInterface.dropTable('users');
      */
+    await queryInterface.dropTable('assets');
   }
 };
